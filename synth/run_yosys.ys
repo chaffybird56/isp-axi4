@@ -1,0 +1,50 @@
+# Yosys synthesis script for ISP-AI pipeline
+# Synthesizes the top-level module and generates area/timing reports
+
+# Read RTL files
+read_verilog -sv ../rtl/ai/linebuf_3_rv.v
+read_verilog -sv ../rtl/ai/conv3x3_int8_rv.v
+read_verilog -sv ../rtl/ai/conv1x1_pointwise.v
+read_verilog -sv ../rtl/axi/axi4l_regs_ext.v
+read_verilog -sv ../rtl/axi/axi4s_rgb_dw_pw_top.v
+
+# Set top module
+hierarchy -top axi4s_rgb_dw_pw_top
+
+# Check design
+check
+
+# Synthesis options
+synth -top axi4s_rgb_dw_pw_top
+
+# Technology mapping (generic cells)
+dfflibmap -liberty +/xilinx/cells_sim.v
+abc -liberty +/xilinx/cells_sim.v
+
+# Clean up
+clean
+
+# Write netlist
+write_verilog -noattr synth/netlist.v
+
+# Generate statistics
+stat -width
+
+# Report timing (if available)
+# report_timing -format full
+
+# Write synthesis log
+tee -o synth.log {
+    echo "=== ISP-AI Pipeline Synthesis Report ==="
+    echo "Top Module: axi4s_rgb_dw_pw_top"
+    echo "Target: Generic technology"
+    echo ""
+    echo "=== Design Statistics ==="
+    stat
+    echo ""
+    echo "=== Memory Usage ==="
+    memory_map
+    echo ""
+    echo "=== Synthesis completed successfully ==="
+}
+
