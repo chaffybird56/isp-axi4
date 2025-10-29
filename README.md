@@ -1,10 +1,10 @@
-# 🎥 ISP-AI Pipeline Demo
+# 🎥 ISP-AI Pipeline =
 
 **Live demonstration of camera ISP pipeline with AI separable convolution**
 
-A comprehensive hardware hackathon project showcasing a complete ISP (Image Signal Processor) pipeline with depthwise separable convolution, AXI4-Stream protocol, and real-time web interface.
+A comprehensive hardware project showcasing a complete ISP (Image Signal Processor) pipeline with depthwise separable convolution, AXI4-Stream protocol, and real-time web interface.
 
-## 🏆 Why This Wins at Hackathons
+## 🏆 Accomplishments
 
 - **Visual Impact**: Live web app with instant image processing updates
 - **Hardware Depth**: Complete RTL design with AXI4-Stream, verification, and synthesis
@@ -299,5 +299,5 @@ MIT License - Feel free to use for hackathons, education, and projects.
 
 ---
 
-**ISP-AI Pipeline Demo** | Built for hardware hackathons | AXI4-Stream • Depthwise Conv • Real-time Processing
+**ISP-AI Pipeline Demo** | Built to showcase hardware depth of knowledge | AXI4-Stream • Depthwise Conv • Real-time Processing
 
