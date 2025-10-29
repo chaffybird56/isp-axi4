@@ -1,4 +1,4 @@
-# 🎥 ISP-AI Pipeline =
+# 🎥 Image Signal Processor 
 
 **Live demonstration of camera ISP pipeline with AI separable convolution**
 
