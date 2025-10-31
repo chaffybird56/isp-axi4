@@ -52,10 +52,14 @@ help:
 # Verification with cocotb
 test:
 	@echo "Running cocotb verification tests..."
+	@mkdir -p $(VERIF_DIR)/metrics
 	cd $(VERIF_DIR) && \
 	MODULE=test_conv TOPLEVEL=conv3x3_int8_rv \
 	SIM=verilator COCOTB_REDUCED_LOG_FMT=1 \
 	python3 -m pytest test_conv.py -v
+	@echo ""
+	@echo "Test metrics saved in verif/metrics/"
+	@ls -lh $(VERIF_DIR)/metrics/*.json 2>/dev/null || echo "No metrics files generated"
 
 # Icarus Verilog simulation
 sim:
@@ -63,6 +67,7 @@ sim:
 	$(IVERILOG) $(IVERILOG_FLAGS) \
 		-o $(SIM_DIR)/tb_linebuf.vvp \
 		$(RTL_DIR)/ai/linebuf_3_rv.v \
+		$(RTL_DIR)/axi/axi4s_assertions.sv \
 		$(SIM_DIR)/tb_linebuf.sv
 	cd $(SIM_DIR) && $(VVP) tb_linebuf.vvp
 
@@ -170,7 +175,7 @@ docs:
 # Install dependencies
 install-deps:
 	@echo "Installing Python dependencies..."
-	pip3 install numpy pillow opencv-python streamlit cocotb matplotlib
+	pip3 install numpy pillow opencv-python streamlit cocotb matplotlib scikit-image
 	@echo "Dependencies installed."
 
 # Status check
