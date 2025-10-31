@@ -24,43 +24,199 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better styling
+# Custom CSS for modern professional styling
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 3rem;
-        font-weight: bold;
-        text-align: center;
-        color: #1f77b4;
-        margin-bottom: 2rem;
+    /* Global Styles */
+    .stApp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-attachment: fixed;
     }
+    
+    [data-testid="stAppViewContainer"] {
+        background: rgba(255, 255, 255, 0.95);
+    }
+    
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+    }
+    
+    /* Main Header with Gradient */
+    .main-header {
+        font-size: 3.5rem;
+        font-weight: 800;
+        text-align: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Section Headers */
     .section-header {
-        font-size: 1.5rem;
-        font-weight: bold;
+        font-size: 1.8rem;
+        font-weight: 700;
         color: #2c3e50;
         margin-top: 2rem;
         margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 3px solid;
+        border-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%) 1;
     }
+    
+    /* Metric Cards with Shadow */
     .metric-card {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border-left: 4px solid #1f77b4;
+        background: white;
+        padding: 1.2rem;
+        border-radius: 12px;
+        border-left: 5px solid #667eea;
         margin: 0.5rem 0;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
     }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* Kernel Grid */
     .kernel-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 0.5rem;
+        gap: 0.75rem;
         margin: 1rem 0;
+        padding: 1rem;
+        background: rgba(102, 126, 234, 0.05);
+        border-radius: 8px;
     }
+    
+    /* Status Colors */
     .status-success {
         color: #28a745;
         font-weight: bold;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
+    
     .status-error {
         color: #dc3545;
         font-weight: bold;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    /* Button Styling */
+    .stButton > button {
+        border-radius: 8px;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* Sidebar Styling */
+    .stSidebar .stMarkdown, 
+    .stSidebar .stMarkdown p,
+    .stSidebar .stMarkdown span,
+    .stSidebar .stMarkdown div {
+        color: #ffffff !important;
+    }
+    
+    .stSidebar .stMarkdown strong,
+    .stSidebar .stMarkdown b {
+        color: #f39c12 !important;
+    }
+    
+    /* Sidebar headings */
+    .stSidebar h1, .stSidebar h2, .stSidebar h3 {
+        color: #ffffff !important;
+    }
+    
+    /* Radio button labels - yellow for visibility */
+    .stSidebar label,
+    .stSidebar [data-testid="stRadio"] label,
+    .stSidebar [data-testid="stRadio"] label p,
+    .stSidebar .stRadio label,
+    .stSidebar .stRadio label p {
+        color: #ffeb3b !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Radio button text spans */
+    .stSidebar [data-testid="stRadio"] > div > div,
+    .stSidebar [data-testid="stRadio"] > div > div > p {
+        color: #ffeb3b !important;
+    }
+    
+    /* Image alignment fix */
+    [data-testid="stImage"] {
+        margin: 0 auto;
+        display: block;
+    }
+    
+    /* Column alignment */
+    .stColumn {
+        vertical-align: top;
+    }
+    
+    /* Links in sidebar */
+    .stSidebar a {
+        color: #4fc3f7 !important;
+    }
+    
+    /* Button text in sidebar */
+    .stSidebar .stButton > button {
+        color: #ffffff !important;
+    }
+    
+    /* Container Styling */
+    .stContainer {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+    
+    /* Info Boxes */
+    .stAlert {
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+    
+    /* Image Containers */
+    img {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* Scrollable Content */
+    .element-container {
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Code Blocks */
+    pre {
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        border-radius: 4px;
+        padding: 1rem;
+    }
+    
+    /* Links */
+    a {
+        color: #667eea;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    
+    a:hover {
+        color: #764ba2;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -435,7 +591,21 @@ def main():
     if 'monitor' not in st.session_state:
         st.session_state.monitor = PerformanceMonitor()
     if 'test_image' not in st.session_state:
-        st.session_state.test_image = generate_test_image()
+        # Load an actual demo image if available
+        # Check multiple possible paths
+        demo_paths = [
+            os.path.join("demo_images", "checkerboard.png"),
+            os.path.join("..", "demo_images", "checkerboard.png"),
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), "demo_images", "checkerboard.png")
+        ]
+        loaded = False
+        for demo_image_path in demo_paths:
+            if os.path.exists(demo_image_path):
+                st.session_state.test_image = np.array(Image.open(demo_image_path))
+                loaded = True
+                break
+        if not loaded:
+            st.session_state.test_image = generate_test_image()
     
     # Sidebar controls
     with st.sidebar:
@@ -560,9 +730,8 @@ def main():
             except Exception as e:
                 st.error(f"❌ Error loading image: {e}")
         
-        # Container to ensure consistent height
-        with st.container(height=400):
-            st.image(st.session_state.test_image, caption="Input Image", width='stretch')
+        # Display input image with consistent sizing
+        st.image(st.session_state.test_image, caption="Input Image", use_container_width=True)
     
     with col2:
         st.markdown('<div class="section-header">🎨 Processed Output</div>', unsafe_allow_html=True)
@@ -570,9 +739,8 @@ def main():
         if mode == "CPU Demo":
             # Real-time processing
             output_image = st.session_state.processor.process_image(st.session_state.test_image)
-            # Container to ensure consistent height
-            with st.container(height=400):
-                st.image(output_image, caption="Processed Image", width='stretch')
+            # Display output image with consistent sizing
+            st.image(output_image, caption="Processed Image", use_container_width=True)
             
             # Update performance monitor (simulate)
             for _ in range(10):
