@@ -1,0 +1,19 @@
+# Cocotb generated files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+dist/
+build/
+
+# Metrics output
+metrics/*.json
+!metrics/.gitkeep
+
+# Simulation artifacts
+sim_build/
+obj_dir/
+
