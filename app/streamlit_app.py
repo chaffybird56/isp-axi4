@@ -508,28 +508,33 @@ def generate_artwork_image(width: int = 640, height: int = 480) -> np.ndarray:
     return image
 
 def run_rtl_simulation() -> bool:
-    """Run RTL simulation and return success status"""
+    """Run RTL build if available; otherwise CPU reference model (same kernels)."""
     try:
-        # For demo purposes, simulate RTL processing with CPU
-        st.info("🔄 Running RTL simulation...")
-        time.sleep(2)  # Simulate processing time
-        
-        # Process the current image with the current kernel settings
-        processor = st.session_state.processor
-        test_image = st.session_state.test_image
-        
-        # Apply the current kernel
-        processed_image = processor.process_image(test_image)
-        
-        # Save the result as if it came from RTL
-        result_image = Image.fromarray(processed_image)
-        result_image.save("rtl_out.ppm")
-        
-        st.success("✅ RTL simulation completed successfully!")
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sim_bin = os.path.join(root, "sim", "rtl_sim")
+        st.info("Running ISP pipeline (hardware sim if built, else CPU reference model)...")
+
+        if os.path.isfile(sim_bin) and os.access(sim_bin, os.X_OK):
+            subprocess.run([sim_bin], cwd=root, check=True, timeout=120)
+            out_path = os.path.join(root, "rtl_out.ppm")
+            if not os.path.isfile(out_path):
+                out_path = os.path.join(root, "app", "rtl_out.ppm")
+        else:
+            processor = st.session_state.processor
+            processed_image = processor.process_image(st.session_state.test_image)
+            out_path = os.path.join(os.path.dirname(__file__), "rtl_out.png")
+            Image.fromarray(processed_image).save(out_path)
+            st.session_state.last_processed = processed_image
+
+        st.session_state.rtl_output_path = out_path
+        st.success("Pipeline run completed.")
         return True
-        
+
+    except subprocess.TimeoutExpired:
+        st.error("RTL simulation timed out.")
+        return False
     except Exception as e:
-        st.error(f"❌ RTL simulation failed: {e}")
+        st.error(f"Pipeline run failed: {e}")
         return False
 
 def visualize_axi_handshake(monitor: PerformanceMonitor):
@@ -749,16 +754,21 @@ def main():
                 st.session_state.monitor.update(tvalid, tready)
         
         elif mode == "RTL Hardware":
-            # Show RTL output if available
-            if os.path.exists("rtl_out.ppm"):
-                try:
-                    rtl_image = Image.open("rtl_out.ppm")
-                    st.image(rtl_image, caption="RTL Hardware Output", use_column_width=True)
-                    st.success("✅ Hardware output displayed")
-                except Exception as e:
-                    st.error(f"Failed to load RTL output: {e}")
-            else:
-                st.info("Click 'Run RTL Simulation' to generate hardware output")
+            shown = False
+            if "last_processed" in st.session_state:
+                st.image(st.session_state.last_processed, caption="Pipeline output", use_container_width=True)
+                shown = True
+            rtl_path = st.session_state.get("rtl_output_path", "")
+            for candidate in [rtl_path, "rtl_out.png", "rtl_out.ppm", os.path.join("..", "rtl_out.ppm")]:
+                if candidate and os.path.exists(candidate):
+                    try:
+                        st.image(Image.open(candidate), caption="Pipeline output", use_container_width=True)
+                        shown = True
+                        break
+                    except Exception:
+                        pass
+            if not shown:
+                st.info("Click **Run RTL Simulation** or switch to **CPU Demo** for live preview.")
     
     # Performance metrics
     st.markdown('<div class="section-header">📊 Hardware Performance Metrics</div>', unsafe_allow_html=True)

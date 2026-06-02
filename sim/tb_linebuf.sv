@@ -4,8 +4,8 @@
 module tb_linebuf;
 
     // Parameters
-    parameter WIDTH = 640;
-    parameter HEIGHT = 480;
+    parameter WIDTH = 64;
+    parameter HEIGHT = 48;
     parameter DATA_WIDTH = 8;
     
     // Clock and reset

@@ -1,0 +1,8 @@
+numpy>=1.24
+pillow>=10.0
+opencv-python>=4.8
+streamlit>=1.28
+matplotlib>=3.8
+scikit-image>=0.22
+cocotb>=1.8
+pytest>=7.4

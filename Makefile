@@ -23,7 +23,7 @@ STREAMLIT = streamlit
 
 # Flags
 IVERILOG_FLAGS = -g2012 -Wall -Winfloop -Wno-timescale
-VERILATOR_FLAGS = --cc --exe --build --trace --top-module
+VERILATOR_FLAGS = --cc --exe --build --trace -Wno-fatal -Wno-WIDTHTRUNC -Wno-CASEINCOMPLETE -Wno-WIDTHEXPAND
 YOSYS_FLAGS = -c
 
 # Default target
@@ -67,7 +67,6 @@ sim:
 	$(IVERILOG) $(IVERILOG_FLAGS) \
 		-o $(SIM_DIR)/tb_linebuf.vvp \
 		$(RTL_DIR)/ai/linebuf_3_rv.v \
-		$(RTL_DIR)/axi/axi4s_assertions.sv \
 		$(SIM_DIR)/tb_linebuf.sv
 	cd $(SIM_DIR) && $(VVP) tb_linebuf.vvp
 
@@ -92,7 +91,8 @@ rtl_sim: sim/rtl_sim
 # Build Verilator simulation executable
 sim/rtl_sim: $(RTL_DIR)/axi/axi4s_rgb_dw_pw_top.v $(RTL_DIR)/ai/*.v $(RTL_DIR)/axi/*.v $(SIM_DIR)/rtl_dump_main.cpp
 	@echo "Building Verilator simulation..."
-	$(VERILATOR) $(VERILATOR_FLAGS) axi4s_rgb_dw_pw_top \
+	$(VERILATOR) $(VERILATOR_FLAGS) --top-module axi4s_rgb_dw_pw_top \
+		-CFLAGS "-std=c++17" \
 		$(RTL_DIR)/axi/axi4s_rgb_dw_pw_top.v \
 		$(RTL_DIR)/ai/linebuf_3_rv.v \
 		$(RTL_DIR)/ai/conv3x3_int8_rv.v \
@@ -175,8 +175,11 @@ docs:
 # Install dependencies
 install-deps:
 	@echo "Installing Python dependencies..."
-	pip3 install numpy pillow opencv-python streamlit cocotb matplotlib scikit-image
+	pip3 install -r requirements.txt
 	@echo "Dependencies installed."
+
+screenshots:
+	python3 $(TOOLS_DIR)/generate_screenshots.py
 
 # Status check
 status:

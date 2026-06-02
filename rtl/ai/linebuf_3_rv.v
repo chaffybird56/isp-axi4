@@ -42,7 +42,8 @@ module linebuf_3_rv #(
     
     // Output registers
     reg [DATA_WIDTH-1:0] window [0:8];  // 3x3 window
-    
+    integer buf_i;
+
     // Ready/valid handshake logic
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -122,9 +123,11 @@ module linebuf_3_rv #(
                                 col_count <= 10'd0;
                                 row_count <= row_count + 1'b1;
                                 
-                                // Shift buffers
-                                line_buf_0 <= line_buf_1;
-                                line_buf_1 <= line_buf_2;
+                                // Shift buffers (per-element; iverilog lacks array slice assign)
+                                for (buf_i = 0; buf_i < HEIGHT; buf_i = buf_i + 1) begin
+                                    line_buf_0[buf_i] <= line_buf_1[buf_i];
+                                    line_buf_1[buf_i] <= line_buf_2[buf_i];
+                                end
                                 
                                 // Read new line into buf_2
                                 if (s_axis_tvalid) begin

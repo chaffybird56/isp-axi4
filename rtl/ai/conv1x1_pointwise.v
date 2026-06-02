@@ -36,32 +36,25 @@ module conv1x1_pointwise #(
     reg [OUTPUT_DATA_WIDTH-1:0] output_channels [0:OUTPUT_CHANNELS-1];
     
     // MAC results for each output channel
-    wire [DATA_WIDTH+WEIGHT_WIDTH-1:0] mac_results [0:OUTPUT_CHANNELS-1];
-    reg [DATA_WIDTH+WEIGHT_WIDTH-1:0] temp_results [0:OUTPUT_CHANNELS-1];
-    
+    reg [DATA_WIDTH+WEIGHT_WIDTH-1:0] mac_results [0:OUTPUT_CHANNELS-1];
+    integer out_ch_i, in_ch_i;
+
     // State machine
     reg [1:0] state;
     localparam IDLE = 2'd0;
     localparam COMPUTE = 2'd1;
     localparam OUTPUT = 2'd2;
-    
-    // Generate MAC units for each output channel
-    genvar out_ch, in_ch;
-    generate
-        for (out_ch = 0; out_ch < OUTPUT_CHANNELS; out_ch = out_ch + 1) begin : output_channel
-            reg [DATA_WIDTH+WEIGHT_WIDTH-1:0] channel_sum;
-            
-            always @(*) begin
-                channel_sum = $signed(biases[out_ch]);
-                for (in_ch = 0; in_ch < INPUT_CHANNELS; in_ch = in_ch + 1) begin
-                    channel_sum = channel_sum + ($signed(input_channels[in_ch]) * 
-                                                $signed(weights[out_ch * INPUT_CHANNELS + in_ch]));
-                end
+
+    always @(*) begin
+        for (out_ch_i = 0; out_ch_i < OUTPUT_CHANNELS; out_ch_i = out_ch_i + 1) begin
+            mac_results[out_ch_i] = $signed(biases[out_ch_i]);
+            for (in_ch_i = 0; in_ch_i < INPUT_CHANNELS; in_ch_i = in_ch_i + 1) begin
+                mac_results[out_ch_i] = mac_results[out_ch_i]
+                    + ($signed(input_channels[in_ch_i])
+                       * $signed(weights[out_ch_i * INPUT_CHANNELS + in_ch_i]));
             end
-            
-            assign mac_results[out_ch] = channel_sum;
         end
-    endgenerate
+    end
     
     // Main processing
     always @(posedge clk or negedge rst_n) begin

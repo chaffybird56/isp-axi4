@@ -13,13 +13,17 @@
 ![AXI](https://img.shields.io/badge/protocol-AXI4--Stream-brightgreen.svg)
 ![CI](https://img.shields.io/badge/CI-GitHub%20Actions-blue.svg)
 
+![Pipeline architecture](screenshots/screenshot-pipeline-architecture.png)
+
+*AXI4-Stream ISP datapath: line buffer → depthwise 3×3 → pointwise 1×1*
+
 ![Aligned Images with Edge Detection](screenshots/screenshot-aligned-images.png)
 
-*Real-time edge detection on checkerboard pattern: Input (left) → Processed Output (right)*
+*Checkerboard input (left) → edge-enhanced output with 3×3 kernel (right)*
 
-![AXI Handshake Visualization Graph](screenshots/screenshot-axi-handshake-only.png)
+![AXI Handshake Visualization](screenshots/screenshot-axi-handshake-only.png)
 
-*AXI4-Stream handshake protocol visualization: TVALID (blue) and TREADY (green) signals showing data transfers and stalls*
+*TVALID / TREADY handshake timing (representative simulation trace)*
 
 </div>
 
@@ -127,6 +131,9 @@ make synth
 
 # Generate demo images
 make demo
+
+# Regenerate README screenshots
+python3 scripts/generate_screenshots.py
 ```
 
 ## 🔬 Hardware RTL Implementation

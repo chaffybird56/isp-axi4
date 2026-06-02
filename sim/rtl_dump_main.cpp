@@ -4,10 +4,11 @@
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 #include "Vaxi4s_rgb_dw_pw_top.h"
-#include <iostream>
-#include <fstream>
-#include <vector>
+#include <cstddef>
 #include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <vector>
 
 // Image parameters
 const int IMAGE_WIDTH = 640;

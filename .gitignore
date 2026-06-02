@@ -1,0 +1,10 @@
+__pycache__/
+.venv/
+obj_dir/
+sim/obj_dir/
+sim/*.vvp
+sim/rtl_sim
+*.vcd
+rtl_out.ppm
+rtl_out.png
+.pytest_cache/
