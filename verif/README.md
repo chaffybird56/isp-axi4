@@ -63,10 +63,9 @@ make test
 # View generated metrics
 ls -lh verif/metrics/*.json
 
-# Run specific test
+# Run cocotb (Icarus recommended locally; CI uses same)
 cd verif
-MODULE=test_conv TOPLEVEL=conv3x3_int8_rv SIM=verilator \
-python3 -m pytest test_conv.py::test_identity_kernel -v
+SIM=icarus COCOTB_REDUCED_LOG_FMT=1 python3 run_cocotb.py
 ```
 
 ## Dependencies

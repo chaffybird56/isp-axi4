@@ -60,14 +60,12 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install cocotb cocotb-bus pytest scikit-image
+          pip install cocotb cocotb-tools cocotb-bus pytest scikit-image
       
       - name: Run Cocotb tests
         run: |
           cd verif
-          MODULE=test_conv TOPLEVEL=conv3x3_int8_rv \
-          SIM=verilator COCOTB_REDUCED_LOG_FMT=1 \
-          python -m pytest test_conv.py -v || true
+          SIM=icarus COCOTB_REDUCED_LOG_FMT=1 python run_cocotb.py || true
           # Continue even if tests fail to collect metrics
       
       - name: Collect test metrics

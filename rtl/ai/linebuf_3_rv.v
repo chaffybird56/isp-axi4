@@ -25,9 +25,9 @@ module linebuf_3_rv #(
 );
 
     // Internal signals
-    reg [DATA_WIDTH-1:0] line_buf_0 [0:HEIGHT-1];
-    reg [DATA_WIDTH-1:0] line_buf_1 [0:HEIGHT-1];
-    reg [DATA_WIDTH-1:0] line_buf_2 [0:HEIGHT-1];
+    reg [DATA_WIDTH-1:0] line_buf_0 [0:WIDTH-1];
+    reg [DATA_WIDTH-1:0] line_buf_1 [0:WIDTH-1];
+    reg [DATA_WIDTH-1:0] line_buf_2 [0:WIDTH-1];
     
     reg [9:0] col_count;
     reg [9:0] row_count;
@@ -91,10 +91,11 @@ module linebuf_3_rv #(
                 end
                 
                 PROCESSING: begin
+                    s_axis_tready <= 1'b0;
                     // Generate 3x3 window and output
                     if (!m_axis_tvalid || (m_axis_tvalid && m_axis_tready)) begin
-                        // Build 3x3 window
-                        if (col_count > 0 && col_count < HEIGHT-1) begin
+                        // Build 3x3 window (columns indexed by WIDTH)
+                        if (col_count > 0 && col_count < WIDTH - 1) begin
                             // Top row
                             window[0] <= line_buf_0[col_count-1];
                             window[1] <= line_buf_0[col_count];
@@ -118,26 +119,38 @@ module linebuf_3_rv #(
                             m_axis_tuser <= 3'd0;
                             
                             // Check for end of line
-                            if (col_count == HEIGHT-2) begin
+                            if (col_count == WIDTH - 2) begin
                                 m_axis_tlast <= 1'b1;
-                                col_count <= 10'd0;
+                                col_count <= 10'd1;
                                 row_count <= row_count + 1'b1;
                                 
                                 // Shift buffers (per-element; iverilog lacks array slice assign)
-                                for (buf_i = 0; buf_i < HEIGHT; buf_i = buf_i + 1) begin
+                                for (buf_i = 0; buf_i < WIDTH; buf_i = buf_i + 1) begin
                                     line_buf_0[buf_i] <= line_buf_1[buf_i];
                                     line_buf_1[buf_i] <= line_buf_2[buf_i];
                                 end
                                 
-                                // Read new line into buf_2
-                                if (s_axis_tvalid) begin
-                                    line_buf_2[col_count] <= s_axis_tdata;
-                                    s_axis_tready <= 1'b1;
-                                end
+                                s_axis_tready <= 1'b1;
                             end else begin
                                 col_count <= col_count + 1'b1;
                                 m_axis_tlast <= 1'b0;
                             end
+                        end else if (col_count == 0) begin
+                            col_count <= 10'd1;
+                        end
+                    end
+
+                    if (s_axis_tvalid && s_axis_tready) begin
+                        line_buf_2[col_count] <= s_axis_tdata;
+                        if (s_axis_tlast) begin
+                            col_count <= 10'd1;
+                            row_count <= row_count + 1'b1;
+                            for (buf_i = 0; buf_i < WIDTH; buf_i = buf_i + 1) begin
+                                line_buf_0[buf_i] <= line_buf_1[buf_i];
+                                line_buf_1[buf_i] <= line_buf_2[buf_i];
+                            end
+                        end else begin
+                            col_count <= col_count + 1'b1;
                         end
                     end
                 end

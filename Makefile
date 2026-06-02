@@ -53,10 +53,7 @@ help:
 test:
 	@echo "Running cocotb verification tests..."
 	@mkdir -p $(VERIF_DIR)/metrics
-	cd $(VERIF_DIR) && \
-	MODULE=test_conv TOPLEVEL=conv3x3_int8_rv \
-	SIM=verilator COCOTB_REDUCED_LOG_FMT=1 \
-	python3 -m pytest test_conv.py -v
+	cd $(VERIF_DIR) && COCOTB_REDUCED_LOG_FMT=1 python3 run_cocotb.py
 	@echo ""
 	@echo "Test metrics saved in verif/metrics/"
 	@ls -lh $(VERIF_DIR)/metrics/*.json 2>/dev/null || echo "No metrics files generated"
@@ -99,8 +96,8 @@ sim/rtl_sim: $(RTL_DIR)/axi/axi4s_rgb_dw_pw_top.v $(RTL_DIR)/ai/*.v $(RTL_DIR)/a
 		$(RTL_DIR)/ai/conv1x1_pointwise.v \
 		$(RTL_DIR)/axi/axi4l_regs_ext.v \
 		--exe $(SIM_DIR)/rtl_dump_main.cpp
-	cd sim && make -C obj_dir -f Vaxi4s_rgb_dw_pw_top.mk
-	cp sim/obj_dir/Vaxi4s_rgb_dw_pw_top sim/rtl_sim
+	make -C obj_dir -f Vaxi4s_rgb_dw_pw_top.mk
+	cp obj_dir/Vaxi4s_rgb_dw_pw_top $(SIM_DIR)/rtl_sim
 
 # Generate demo images
 demo:
@@ -117,7 +114,7 @@ pd:
 # Clean generated files
 clean:
 	@echo "Cleaning generated files..."
-	rm -rf sim/*.vvp sim/*.vcd sim/obj_dir sim/rtl_sim
+	rm -rf sim/*.vvp sim/*.vcd sim/obj_dir sim/rtl_sim obj_dir
 	rm -rf synth/netlist.v synth/synth.log
 	rm -rf verif/__pycache__ verif/*.pyc
 	rm -rf pd/reports/ pd/*.def pd/*.v pd/*.log

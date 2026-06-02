@@ -8,8 +8,10 @@ Includes PSNR/SSIM image quality metrics
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, FallingEdge, Timer
-from cocotb.binary import BinaryValue
-from cocotb.result import TestFailure
+try:
+    from cocotb.result import TestFailure
+except ImportError:
+    TestFailure = AssertionError
 import numpy as np
 import random
 import json
@@ -105,12 +107,12 @@ class ConvolutionTester:
         self.m_axis_tready.value = 1
         await RisingEdge(self.clock)
         
-        result = self.m_axis_tdata.value
-        last = self.m_axis_tlast.value
-        user = self.m_axis_tuser.value
-        
+        result = int(self.m_axis_tdata.value)
+        last = int(self.m_axis_tlast.value)
+        user = int(self.m_axis_tuser.value)
+
         self.m_axis_tready.value = 0
-        
+
         return result, last, user
     
     def set_kernel(self, kernel):
@@ -137,7 +139,7 @@ class ConvolutionTester:
             reference = reference[:min_shape[0], :min_shape[1]] if len(reference.shape) == 2 else reference[:min_shape[0], :min_shape[1], :min_shape[2]]
             processed = processed[:min_shape[0], :min_shape[1]] if len(processed.shape) == 2 else processed[:min_shape[0], :min_shape[1], :min_shape[2]]
         
-        if HAS_SKIMAGE:
+        if HAS_SKIMAGE and reference.size >= 49:
             try:
                 if len(reference.shape) == 2:
                     psnr = peak_signal_noise_ratio(reference, processed, data_range=255)
@@ -170,8 +172,8 @@ class ConvolutionTester:
             reference = reference[:min_shape[0], :min_shape[1]] if len(reference.shape) == 2 else reference[:min_shape[0], :min_shape[1], :min_shape[2]]
             processed = processed[:min_shape[0], :min_shape[1]] if len(processed.shape) == 2 else processed[:min_shape[0], :min_shape[1], :min_shape[2]]
         
-        # For grayscale or single channel
-        if HAS_SKIMAGE:
+        # For grayscale or single channel (skimage needs >= 7x7 window)
+        if HAS_SKIMAGE and min(reference.shape[:2]) >= 7:
             if len(reference.shape) == 2:
                 ssim = structural_similarity(reference, processed, data_range=255)
             else:
@@ -246,7 +248,7 @@ async def test_identity_kernel(dut):
     tester = ConvolutionTester(dut)
     
     # Start clock
-    cocotb.start_soon(Clock(tester.clock, 10, units="ns").start())
+    cocotb.start_soon(Clock(tester.clock, 10, unit="ns").start())
     
     # Reset
     await tester.reset_dut()
@@ -310,7 +312,7 @@ async def test_edge_detection_kernel(dut):
     tester = ConvolutionTester(dut)
     
     # Start clock
-    cocotb.start_soon(Clock(tester.clock, 10, units="ns").start())
+    cocotb.start_soon(Clock(tester.clock, 10, unit="ns").start())
     
     # Reset
     await tester.reset_dut()
@@ -371,7 +373,7 @@ async def test_relu_activation(dut):
     tester = ConvolutionTester(dut)
     
     # Start clock
-    cocotb.start_soon(Clock(tester.clock, 10, units="ns").start())
+    cocotb.start_soon(Clock(tester.clock, 10, unit="ns").start())
     
     # Reset
     await tester.reset_dut()
@@ -397,7 +399,7 @@ async def test_relu_activation(dut):
     result, last, user = await tester.receive_result()
     
     # Check result (should be clamped to threshold)
-    if result < tester.relu_threshold.value:
+    if result < int(tester.relu_threshold.value):
         raise cocotb.result.TestFailure(f"ReLU failed: got {result}, expected >= {tester.relu_threshold.value}")
 
 @cocotb.test()
@@ -406,7 +408,7 @@ async def test_backpressure(dut):
     tester = ConvolutionTester(dut)
     
     # Start clock
-    cocotb.start_soon(Clock(tester.clock, 10, units="ns").start())
+    cocotb.start_soon(Clock(tester.clock, 10, unit="ns").start())
     
     # Reset
     await tester.reset_dut()

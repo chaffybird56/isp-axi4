@@ -2,6 +2,7 @@ __pycache__/
 .venv/
 obj_dir/
 sim/obj_dir/
+obj_dir/
 sim/*.vvp
 sim/rtl_sim
 *.vcd

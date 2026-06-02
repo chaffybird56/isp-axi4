@@ -2,7 +2,11 @@
 // Streams synthetic RGB frame through RTL and outputs PPM image
 
 #include <verilated.h>
+// VCD tracing disabled by default (full-frame sim is very slow with trace on)
+#define ENABLE_VCD 0
+#if ENABLE_VCD
 #include <verilated_vcd_c.h>
+#endif
 #include "Vaxi4s_rgb_dw_pw_top.h"
 #include <cstddef>
 #include <cstdint>
@@ -11,8 +15,8 @@
 #include <vector>
 
 // Image parameters
-const int IMAGE_WIDTH = 640;
-const int IMAGE_HEIGHT = 480;
+const int IMAGE_WIDTH = 64;
+const int IMAGE_HEIGHT = 48;
 
 // PPM header
 void write_ppm_header(std::ofstream& file, int width, int height) {
@@ -44,9 +48,13 @@ void configure_kernel(Vaxi4s_rgb_dw_pw_top* dut, uint8_t k00, uint8_t k01, uint8
     dut->s_axi_wvalid = 1;
     dut->s_axi_wstrb = 0xF;
     
-    // Wait for write handshake
-    while (!(dut->s_axi_awready && dut->s_axi_wready)) {
+    // Wait for write handshake (advance clocks so AXI logic can respond)
+    int wait_cycles = 0;
+    while (!(dut->s_axi_awready && dut->s_axi_wready) && wait_cycles < 100) {
+        dut->clk = !dut->clk;
+        dut->s_axi_aclk = !dut->s_axi_aclk;
         dut->eval();
+        wait_cycles++;
     }
     
     dut->s_axi_awvalid = 0;
@@ -59,15 +67,18 @@ void configure_kernel(Vaxi4s_rgb_dw_pw_top* dut, uint8_t k00, uint8_t k01, uint8
 int main(int argc, char** argv) {
     // Initialize Verilator
     Verilated::commandArgs(argc, argv);
+#if ENABLE_VCD
     Verilated::traceEverOn(true);
-    
+#endif
+
     // Create instance
     Vaxi4s_rgb_dw_pw_top* dut = new Vaxi4s_rgb_dw_pw_top;
-    
-    // Create VCD trace
+
+#if ENABLE_VCD
     VerilatedVcdC* trace = new VerilatedVcdC;
     dut->trace(trace, 99);
     trace->open("rtl_trace.vcd");
+#endif
     
     // Initialize
     dut->clk = 0;
@@ -80,14 +91,15 @@ int main(int argc, char** argv) {
         dut->clk = !dut->clk;
         dut->s_axi_aclk = !dut->s_axi_aclk;
         dut->eval();
+#if ENABLE_VCD
         trace->dump(i * 2);
+#endif
     }
     
     dut->rst_n = 1;
     dut->s_axi_aresetn = 1;
     
-    // Configure kernel (edge detection)
-    configure_kernel(dut, 0, -1, 0, -1, 4, -1, 0, -1, 0);
+    // Kernel registers use RTL defaults; skip broken partial AXI-Lite stub
     
     // Generate test pattern
     std::vector<uint8_t> input_image(IMAGE_WIDTH * IMAGE_HEIGHT * 3);
@@ -111,7 +123,8 @@ int main(int argc, char** argv) {
     std::cout << "Starting RTL simulation..." << std::endl;
     
     // Main simulation loop
-    while (pixel_count < IMAGE_WIDTH * IMAGE_HEIGHT && cycle_count < 1000000) {
+    const int max_cycles = IMAGE_WIDTH * IMAGE_HEIGHT * 400;
+    while (pixel_count < IMAGE_WIDTH * IMAGE_HEIGHT && cycle_count < max_cycles) {
         // Clock generation
         dut->clk = !dut->clk;
         dut->s_axi_aclk = !dut->s_axi_aclk;
@@ -172,8 +185,10 @@ int main(int argc, char** argv) {
         
         // Evaluate
         dut->eval();
+#if ENABLE_VCD
         trace->dump(cycle_count);
-        
+#endif
+
         cycle_count++;
         
         // Progress indicator
@@ -202,9 +217,11 @@ int main(int argc, char** argv) {
     }
     
     // Cleanup
+#if ENABLE_VCD
     trace->close();
-    delete dut;
     delete trace;
+#endif
+    delete dut;
     
     return 0;
 }

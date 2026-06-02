@@ -2,8 +2,8 @@
 // Wires line buffers -> 3x3 depthwise convs -> 1x1 pointwise -> AXI-Stream output
 
 module axi4s_rgb_dw_pw_top #(
-    parameter IMAGE_WIDTH = 640,
-    parameter IMAGE_HEIGHT = 480,
+    parameter IMAGE_WIDTH = 64,
+    parameter IMAGE_HEIGHT = 48,
     parameter DATA_WIDTH = 24,  // RGB 8-bit per channel
     parameter CONV_DATA_WIDTH = 16,
     parameter OUTPUT_WIDTH = 8
@@ -51,12 +51,13 @@ module axi4s_rgb_dw_pw_top #(
 );
 
     // Internal signals
-    wire [DATA_WIDTH-1:0] rgb_data;
-    wire [2:0] r_data, g_data, b_data;
-    wire [2:0] r_valid, g_valid, b_valid;
-    wire [2:0] r_ready, g_ready, b_ready;
-    wire [2:0] r_last, g_last, b_last;
+    wire [7:0] r_data, g_data, b_data;
+    wire r_valid, g_valid, b_valid;
+    wire r_ready, g_ready, b_ready;
+    wire r_last, g_last, b_last;
     wire [2:0] r_user, g_user, b_user;
+    wire dw_in_valid;
+    wire pw_in_ready;
     
     // Line buffer outputs (3x3 windows)
     wire [DATA_WIDTH*9-1:0] r_window, g_window, b_window;
@@ -91,8 +92,8 @@ module axi4s_rgb_dw_pw_top #(
     assign g_data = s_axis_tdata[15:8];
     assign b_data = s_axis_tdata[23:16];
     
-    assign rgb_data = {b_data, g_data, r_data};  // Pack back to RGB
-    
+    assign dw_in_valid = dw_out_valid[0] & dw_out_valid[1] & dw_out_valid[2];
+
     // AXI4-Lite register interface
     axi4l_regs_ext #(
         .C_S_AXI_DATA_WIDTH(32),
@@ -288,8 +289,8 @@ module axi4s_rgb_dw_pw_top #(
         .weights(pw_weights),
         .biases(pw_biases),
         .s_axis_tdata(dw_out_data),
-        .s_axis_tvalid(&dw_out_valid),  // All channels must be valid
-        .s_axis_tready(&dw_out_ready),  // All channels must be ready
+        .s_axis_tvalid(dw_in_valid),
+        .s_axis_tready(pw_in_ready),
         .s_axis_tlast(dw_out_last[0]),
         .s_axis_tuser(dw_out_user[0]),
         .m_axis_tdata(pw_out_data),
@@ -310,11 +311,11 @@ module axi4s_rgb_dw_pw_top #(
     assign g_user = s_axis_tuser;
     assign b_user = s_axis_tuser;
     
-    // Output assignment
-    assign s_axis_tready = r_ready && g_ready && b_ready;
-    assign dw_out_ready[0] = pw_out_ready;
-    assign dw_out_ready[1] = pw_out_ready;
-    assign dw_out_ready[2] = pw_out_ready;
+    // Ready/valid back-pressure (scalar handshakes)
+    assign s_axis_tready = r_ready & g_ready & b_ready;
+    assign dw_out_ready[0] = pw_in_ready;
+    assign dw_out_ready[1] = pw_in_ready;
+    assign dw_out_ready[2] = pw_in_ready;
     assign pw_out_ready = m_axis_tready;
     
     assign m_axis_tdata = pw_out_data;
