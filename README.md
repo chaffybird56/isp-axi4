@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎥 ISP-AI Pipeline
+# ISP-AI Pipeline
 ## Image Signal Processor with Depthwise Separable Convolution
 
 **A complete hardware-accelerated image processing pipeline featuring RTL design, AXI4-Stream protocol, and real-time web visualization**
@@ -27,9 +27,9 @@
 
 </div>
 
-## 🔬 What's an ISP?
+## What's an ISP?
 
-**Image Signal Processor (ISP)** - Hardware that converts raw sensor data into display-ready images. Every camera, from your smartphone to autonomous vehicles, uses an ISP to process raw pixel data through multiple stages:
+**Image Signal Processor (ISP)**- Hardware that converts raw sensor data into display-ready images. Every camera, from your smartphone to autonomous vehicles, uses an ISP to process raw pixel data through multiple stages:
 
 1. **Demosaic**: Convert raw Bayer sensor data to RGB pixels
 2. **Color Correction**: Adjust color balance, saturation, and white balance
@@ -37,25 +37,25 @@
 4. **Noise Reduction**: Filter out sensor noise using spatial/temporal filters
 5. **Sharpening**: Enhance edge detail using convolution kernels
 
-This project implements a hardware ISP pipeline with **AI-accelerated convolution** using depthwise separable convolution (similar to MobileNet), optimized for edge AI applications.
+This project implements a hardware ISP pipeline with **AI-accelerated convolution**using depthwise separable convolution (similar to MobileNet), optimized for edge AI applications.
 
 **Everywhere**: Smartphones, autonomous vehicles, security cameras, industrial vision systems, medical imaging devices.
 
-## 🌟 Features
+## Features
 
-- ⚡ **Real-time Processing**: Live image processing with instant results
-- 🎨 **Modern UI**: Professional gradient design with high-contrast yellow labels and aligned image display
-- 🔧 **Hardware RTL**: Complete Verilog RTL design with AXI4-Stream protocol
-- 📊 **Performance Metrics**: Live throughput monitoring and AXI handshake visualization
-- 🤖 **AI-Powered**: Depthwise separable convolution for efficient edge AI
-- 🐳 **Docker Ready**: Containerized deployment with comprehensive build system
-- 🧪 **Full Verification**: Cocotb tests with PSNR/SSIM metrics, protocol assertions, and CI/CD
-- ✅ **CI/CD Pipeline**: Automated testing with GitHub Actions (lint, cocotb, Verilator, Yosys)
-- 📈 **Quality Metrics**: Automatic PSNR/SSIM calculation and per-test metric tracking
-- 🔒 **Protocol Assertions**: SystemVerilog assertions (SVA) and Cocotb runtime checks for AXI compliance
-- 🎯 **Interactive Demo**: Multiple kernel presets and custom filter creation
+- **Real-time Processing**: Live image processing with instant results
+- **Modern UI**: Professional gradient design with high-contrast yellow labels and aligned image display
+- **Hardware RTL**: Complete Verilog RTL design with AXI4-Stream protocol
+- **Performance Metrics**: Live throughput monitoring and AXI handshake visualization
+- **AI-Powered**: Depthwise separable convolution for efficient edge AI
+- **Docker Ready**: Containerized deployment with comprehensive build system
+- **Full Verification**: Cocotb tests with PSNR/SSIM metrics, protocol assertions, and CI/CD
+- **CI/CD Pipeline**: Automated testing with GitHub Actions (lint, cocotb, Verilator, Yosys)
+- **Quality Metrics**: Automatic PSNR/SSIM calculation and per-test metric tracking
+- **Protocol Assertions**: SystemVerilog assertions (SVA) and Cocotb runtime checks for AXI compliance
+- **Interactive Demo**: Multiple kernel presets and custom filter creation
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: Streamlit (Python web framework)
 - **Image Processing**: OpenCV, NumPy, PIL, scikit-image (PSNR/SSIM)
@@ -66,7 +66,7 @@ This project implements a hardware ISP pipeline with **AI-accelerated convolutio
 - **Synthesis**: Yosys
 - **Visualization**: Matplotlib for AXI handshake graphs
 
-## 🎯 Project Goals
+## Project Goals
 
 This project demonstrates a complete hardware-accelerated image processing system:
 
@@ -76,14 +76,14 @@ This project demonstrates a complete hardware-accelerated image processing syste
 - **Full Design Flow**: RTL → Verification → Synthesis → Performance Analysis
 - **Interactive Visualization**: Web interface for real-time kernel parameter tuning and hardware monitoring
 
-## 🏗️ Architecture
+## Architecture
 
 ### Hardware Pipeline
 ```
 Input Image → Line Buffers (3-line) → Depthwise 3×3 Conv → Pointwise 1×1 → Output
-                    ↓                         ↓                    ↓
-               AXI4-Stream              AXI4-Stream         AXI4-Stream
-               Ready/Valid              Ready/Valid         Ready/Valid
+ ↓ ↓ ↓
+ AXI4-Stream AXI4-Stream AXI4-Stream
+ Ready/Valid Ready/Valid Ready/Valid
 ```
 
 ### Key Components
@@ -98,7 +98,7 @@ Input Image → Line Buffers (3-line) → Depthwise 3×3 Conv → Pointwise 1×1
 - **Embedded Friendly**: Perfect for edge AI accelerators
 - **MobileNet Style**: Industry-proven efficiency pattern
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1) Build & Run (Docker)
 ```bash
@@ -107,12 +107,12 @@ docker build -t isp-ai .
 
 # Run container with web interface
 docker run --rm -it -p 8501:8501 \
-  -v $PWD:/workspace \
-  -v $PWD/out:/mnt/data \
-  isp-ai
+ -v $PWD:/workspace \
+ -v $PWD/out:/mnt/data \
+ isp-ai
 
 # Inside container
-make ui    # Launch web app at http://localhost:8501
+make ui # Launch web app at http://localhost:8501
 ```
 
 ### 2) Local Development
@@ -136,11 +136,11 @@ make demo
 python3 scripts/generate_screenshots.py
 ```
 
-## 🔬 Hardware RTL Implementation
+## Hardware RTL Implementation
 
 ### Digital Design Architecture
 
-The hardware implementation uses a **pipelined datapath** with AXI4-Stream interfaces for high-throughput image processing:
+The hardware implementation uses a **pipelined datapath**with AXI4-Stream interfaces for high-throughput image processing:
 
 #### **1. Line Buffer Module (`linebuf_3_rv.v`)**
 **RTL Design Details:**
@@ -154,12 +154,12 @@ The hardware implementation uses a **pipelined datapath** with AXI4-Stream inter
 ```verilog
 // Pseudo-code architecture
 always @(posedge clk) begin
-    if (tready && tvalid) begin
-        line_buffer[2] <= line_buffer[1];
-        line_buffer[1] <= line_buffer[0];
-        line_buffer[0] <= input_pixel;
-        window_3x3 <= construct_window(line_buffer);
-    end
+ if (tready && tvalid) begin
+ line_buffer[2] <= line_buffer[1];
+ line_buffer[1] <= line_buffer[0];
+ line_buffer[0] <= input_pixel;
+ window_3x3 <= construct_window(line_buffer);
+ end
 end
 ```
 
@@ -168,9 +168,9 @@ end
 - **Separable Channel Processing**: Independent convolution engines for R, G, B channels
 - **Signed 8-bit Arithmetic**: Uses `signed` data types for negative kernel coefficients
 - **Pipelined MAC Pipeline**: 9-stage multiplier-accumulator for 3×3 kernel
-  - Stage 1-9: Multiply kernel coefficients with window pixels
-  - Stage 10: Accumulate all products
-  - Stage 11: Saturate/clip to valid pixel range
+ - Stage 1-9: Multiply kernel coefficients with window pixels
+ - Stage 10: Accumulate all products
+ - Stage 11: Saturate/clip to valid pixel range
 - **Kernel Configuration**: Parameterized kernel coefficients via AXI4-Lite register interface
 - **Stall Propagation**: Forward stalls to line buffer when downstream isn't ready
 
@@ -190,8 +190,8 @@ end
 **Ready/Valid Handshake:**
 ```verilog
 // Standard AXI4-Stream handshake
-assign transfer = tvalid && tready;  // Data transfer on this clock
-assign stall = tvalid && !tready;    // Back-pressure detected
+assign transfer = tvalid && tready; // Data transfer on this clock
+assign stall = tvalid && !tready; // Back-pressure detected
 ```
 
 **Design Considerations:**
@@ -204,10 +204,10 @@ assign stall = tvalid && !tready;    // Back-pressure detected
 
 #### **Verification Methodology**
 - **Cocotb Tests**: Python-based verification using cocotb framework
-  - Identity kernel tests (pass-through verification)
-  - Edge detection kernel functional tests
-  - ReLU activation threshold tests
-  - Back-pressure and stall scenario verification
+ - Identity kernel tests (pass-through verification)
+ - Edge detection kernel functional tests
+ - ReLU activation threshold tests
+ - Back-pressure and stall scenario verification
 - **Icarus Verilog Simulation**: Functional RTL simulation with waveform debugging
 - **Verilator C++**: Cycle-accurate hardware-in-the-loop simulation
 
@@ -243,7 +243,7 @@ stat
 - Read transactions query performance metrics
 - Synchronous register updates with write enable logic
 
-## 🌐 Web Interface Implementation
+## Web Interface Implementation
 
 ### Frontend Architecture (Streamlit)
 
@@ -264,7 +264,7 @@ stat
 4. Normalize: `clip(output, 0, 255).astype(uint8)`
 5. Display: Side-by-side comparison with input image
 
-## 🎛️ Web Interface Features
+## Web Interface Features
 
 ### Control Panel
 - **Kernel Presets**: Identity, Sharpen, Edge Detection, Blur, Emboss
@@ -298,17 +298,17 @@ stat
 - Helps debug back-pressure scenarios and optimize pipeline throughput
 - Interactive web interface with live graph updates
 
-## 🛠️ Build Targets
+## Build Targets
 
 ```bash
-make ui        # Launch Streamlit web app
-make test      # Run cocotb verification with PSNR/SSIM metrics
-make sim       # Run Icarus testbenches with SVA assertions
-make synth     # Yosys synthesis
-make rtl_sim   # Verilator hardware simulation
-make demo      # Generate demo images
-make install-deps  # Install all dependencies (including scikit-image)
-make clean     # Clean generated files
+make ui # Launch Streamlit web app
+make test # Run cocotb verification with PSNR/SSIM metrics
+make sim # Run Icarus testbenches with SVA assertions
+make synth # Yosys synthesis
+make rtl_sim # Verilator hardware simulation
+make demo # Generate demo images
+make install-deps # Install all dependencies (including scikit-image)
+make clean # Clean generated files
 ```
 
 **Test Metrics Output:**
@@ -319,7 +319,7 @@ make test
 cat verif/metrics/test_identity_kernel_metrics.json
 ```
 
-## 🧪 Verification & Quality Assurance
+## Verification & Quality Assurance
 
 ### Automated Testing with Metrics
 
@@ -337,16 +337,16 @@ cat verif/metrics/test_identity_kernel_metrics.json
 
 **Protocol Assertions:**
 - **SystemVerilog Assertions (SVA)**: `rtl/axi/axi4s_assertions.sv` with 10+ protocol checks
-  - TVALID/TREADY handshake compliance
-  - Data stability during back-pressure
-  - Packet framing correctness (TLAST consistency)
-  - Reset state verification
+ - TVALID/TREADY handshake compliance
+ - Data stability during back-pressure
+ - Packet framing correctness (TLAST consistency)
+ - Reset state verification
 - **Runtime Cocotb Assertions**: Real-time protocol monitoring during simulation
 - **Coverage Tracking**: Handshake, stall, and idle state coverage
 
 ### Continuous Integration
 
-**GitHub Actions CI Pipeline** (`.github/workflows/ci.yml`):
+**GitHub Actions CI Pipeline**(`.github/workflows/ci.yml`):
 - **Lint Job**: Verilator-based RTL linting
 - **Cocotb Tests**: Automated verification with metrics collection
 - **Verilator Simulation**: Hardware-in-the-loop testing
@@ -365,21 +365,21 @@ cat verif/metrics/test_identity_kernel_metrics.json
 - **PPM Output**: Hardware-processed images for visual verification
 - **Performance Monitoring**: Live hardware metrics and timing analysis
 
-## 📊 Synthesis & Analysis
+## Synthesis & Analysis
 
 ### Yosys Synthesis
 ```bash
-make synth     # Run synthesis
+make synth # Run synthesis
 # Results in synth/synth.log
 ```
 
 ### OpenROAD Place & Route (Optional)
 ```bash
-make pd        # Run place & route
+make pd # Run place & route
 # Results in pd/reports/
 ```
 
-## 🎨 Demo Images
+## Demo Images
 
 Generate test patterns:
 ```bash
@@ -394,14 +394,14 @@ Available patterns:
 - **Edge Test**: Optimized for edge detection
 - **Text Pattern**: Geometric shapes and lines
 
-## 🌐 Web Interface Usage
+## Web Interface Usage
 
 ### Basic Usage
-1. **Upload Image** or use default test pattern
-2. **Select Preset** or adjust custom kernel sliders
-3. **Configure ReLU** threshold and enable
-4. **Watch Output** update in real-time
-5. **Monitor Performance** metrics and AXI signals
+1. **Upload Image**or use default test pattern
+2. **Select Preset**or adjust custom kernel sliders
+3. **Configure ReLU**threshold and enable
+4. **Watch Output**update in real-time
+5. **Monitor Performance**metrics and AXI signals
 
 ### Advanced Features
 - **RTL Mode**: Switch to hardware simulation
@@ -409,12 +409,12 @@ Available patterns:
 - **View Hardware Output**: See real hardware results
 - **Performance Analysis**: Monitor throughput and stalls
 
-## 🧠 AI Convolution Architecture
+## AI Convolution Architecture
 
 ### Depthwise Separable Convolution
 
 **Mathematical Foundation:**
-Traditional 3D convolution: `K × K × C_in × C_out` parameters  
+Traditional 3D convolution: `K × K × C_in × C_out` parameters
 Depthwise separable: `K × K × C_in + C_in × C_out` parameters
 
 For a 3×3 kernel on RGB (3 channels):
@@ -435,7 +435,7 @@ For a 3×3 kernel on RGB (3 channels):
 4. **Configurable Weights**: Runtime kernel updates via AXI4-Lite
 
 
-## 🚀 Stretch Goals
+## Stretch Goals
 
 - **AXI-Lite Programming**: UI-controlled weight programming
 - **Live Camera**: WebRTC integration for real-time camera
@@ -443,7 +443,7 @@ For a 3×3 kernel on RGB (3 channels):
 - **Real PDK**: OpenROAD with actual technology libraries
 - **Coverage Analysis**: Functional coverage reporting
 
-## 📚 References
+## References
 
 - **AXI4-Stream Spec**: ARM AMBA specification
 - **MobileNet Paper**: Separable convolution efficiency
@@ -451,7 +451,7 @@ For a 3×3 kernel on RGB (3 channels):
 - **Verilator Guide**: Hardware simulation
 - **Streamlit Docs**: Web app framework
 
-## 🤝 Contributing
+## Contributing
 
 Key areas for extension:
 - Additional convolution kernels (Sobel, Laplacian, custom filters)
@@ -460,7 +460,7 @@ Key areas for extension:
 - Real-time camera integration (WebRTC, USB camera support)
 - Performance optimization (BRAM integration, pipeline balancing)
 
-## 📄 License
+## License
 
 MIT License - Feel free to use for hackathons, education, and projects.
 
